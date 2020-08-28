@@ -8,7 +8,7 @@ Thumbs.db
 
 # Vendors
 client/node_modules/
-../server/node_modules/
+./server/node_modules/
 
 # Build
 client/dist/
