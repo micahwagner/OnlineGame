@@ -17,6 +17,10 @@ export default class player extends Phaser.Physics.Arcade.Image {
 	}
 
 	update() {
+		this.move();
+	}
+
+	move() {
 		this.body.setVelocity(0);
 		this.cursors = this.scene.input.keyboard.createCursorKeys();
 
