@@ -13,5 +13,12 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.0",
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^8.1.0"
   }
 }
