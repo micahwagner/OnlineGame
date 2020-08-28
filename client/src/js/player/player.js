@@ -16,21 +16,21 @@ export default class player extends Phaser.Physics.Arcade.Image {
 		this.scene.add.existing(this);
 	}
 
-	update(cursors) {
+	update() {
 		this.body.setVelocity(0);
+		this.cursors = this.scene.input.keyboard.createCursorKeys();
 
-		if (cursors.left.isDown) {
+
+		if (this.cursors.left.isDown) {
 			this.body.setVelocityX(-this.velocity);
-		} else if (cursors.right.isDown) {
+		} else if (this.cursors.right.isDown) {
 			this.body.setVelocityX(this.velocity);
 		}
 
-		if (cursors.up.isDown) {
+		if (this.cursors.up.isDown) {
 			this.body.setVelocityY(-this.velocity);
-		} else if (cursors.down.isDown) {
+		} else if (this.cursors.down.isDown) {
 			this.body.setVelocityY(this.velocity);
 		}
 	}
-
-
 }

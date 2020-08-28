@@ -10,6 +10,7 @@ io.on('connection', function(socket) {
 	console.log(players);
 
 	socket.on('disconnect', function() {
+		deletePlayer(socket);
 		console.log('user disconnected '+ socket.id);
 	});
 });
@@ -17,8 +18,13 @@ io.on('connection', function(socket) {
 function createPlayer(socket){
 	let player = new PlayerModel(socket.id, [0, 0]);
 	players[socket.id] = player.pos;
+	socket.emit("currentPlayers", players);
+	socket.broadcast.emit("newPlayer", players[socket.id]);
 }
 
+function deletePlayer(socket){
+	delete players[socket.id]; 
+}
 // app.use(express.static(__dirname + '/public'));
 
 // app.get('/', function(req, res) {
