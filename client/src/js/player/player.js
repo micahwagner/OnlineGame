@@ -1,10 +1,11 @@
 import * as Phaser from 'phaser';
 
 export default class player extends Phaser.Physics.Arcade.Image {
-	constructor(scene, x, y, key, frame) {
+	constructor(scene, x, y, key, frame, mainPlayer) {
 		super(scene, x, y, key, frame);
 		this.scene = scene; // the scene this container will be added to
 		this.velocity = 200;
+		this.mainPlayer = mainPlayer;
 
 		// enable physics
 		this.scene.physics.world.enable(this);
@@ -24,17 +25,18 @@ export default class player extends Phaser.Physics.Arcade.Image {
 		this.body.setVelocity(0);
 		this.cursors = this.scene.input.keyboard.createCursorKeys();
 
+		if (this.mainPlayer) {
+			if (this.cursors.left.isDown) {
+				this.body.setVelocityX(-this.velocity);
+			} else if (this.cursors.right.isDown) {
+				this.body.setVelocityX(this.velocity);
+			}
 
-		if (this.cursors.left.isDown) {
-			this.body.setVelocityX(-this.velocity);
-		} else if (this.cursors.right.isDown) {
-			this.body.setVelocityX(this.velocity);
-		}
-
-		if (this.cursors.up.isDown) {
-			this.body.setVelocityY(-this.velocity);
-		} else if (this.cursors.down.isDown) {
-			this.body.setVelocityY(this.velocity);
+			if (this.cursors.up.isDown) {
+				this.body.setVelocityY(-this.velocity);
+			} else if (this.cursors.down.isDown) {
+				this.body.setVelocityY(this.velocity);
+			}
 		}
 	}
 }

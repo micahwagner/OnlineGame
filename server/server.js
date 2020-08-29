@@ -17,7 +17,7 @@ io.on('connection', function(socket) {
 
 function createPlayer(socket){
 	let player = new PlayerModel(socket.id, [0, 0]);
-	players[socket.id] = player.pos;
+	players[socket.id] = player;
 	socket.emit("currentPlayers", players);
 	socket.broadcast.emit("newPlayer", players[socket.id]);
 }

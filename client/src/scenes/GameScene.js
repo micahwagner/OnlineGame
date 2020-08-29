@@ -17,11 +17,10 @@ export default class Game extends Phaser.Scene {
 		console.log("bruh")
 		this.listenForEvents();
 		this.createGroup();
-		this.player = new Player(this, 100, 100, "player", 0);
 	}
 
 	update() {
-		this.player.update();
+		if(this.mainPlayer) this.mainPlayer.update();
 	}
 
 	listenForEvents() {
@@ -32,21 +31,30 @@ export default class Game extends Phaser.Scene {
 		});
 
 		this.socket.on('currentPlayers', (players) => {
-			console.log(players);
 			Object.keys(players).forEach((id) => {
-				this.createPlayer();
+				console.log(players);
+				if (players[id].playerID === this.socket.id) {
+					this.createPlayer(true);
+				} else {
+					this.createPlayer(false);
+				}
 			});
 		});
 
 		this.socket.on("newPlayer", () => {
-			this.createPlayer();
-			console.log("bruh");
+			this.createPlayer(false);
 		});
 	}
 
-	createPlayer() {
-		let player = new Player(this, 0, 0, "player", 0)
-		this.otherPlayers.add(player);
+	createPlayer(mainPlayer) {
+		let player = new Player(this, 0, 0, "player", 0, mainPlayer);
+		console.log(player);
+		if(!mainPlayer){
+			this.otherPlayers.add(player);
+		} else {
+			this.mainPlayer = player;
+		}
+		
 	}
 
 	createGroup() {
