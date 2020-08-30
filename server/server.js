@@ -6,7 +6,7 @@ var PlayerModel = require("../server/PlayerModel.js");
 let players = {}
 
 io.on('connection', function(socket) {
-	socket.on("newPlayer" () => {
+	socket.on("playerJoined", () => {
 		createPlayer(socket);
 	})
 	console.log(players);
