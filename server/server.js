@@ -6,8 +6,17 @@ var PlayerModel = require("../server/PlayerModel.js");
 let players = {}
 
 io.on('connection', function(socket) {
-	createPlayer(socket);
+	socket.on("newPlayer" () => {
+		createPlayer(socket);
+	})
 	console.log(players);
+
+	socket.on("playerMoved", (playerData) => {
+		players[socket.id].pos[0] = playerData.x;
+		players[socket.id].pos[1] = playerData.y;
+
+		io.emit("movePlayer", players[socket.id]); 
+	});
 
 	socket.on('disconnect', function() {
 		deletePlayer(socket);

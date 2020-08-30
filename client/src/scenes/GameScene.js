@@ -20,41 +20,75 @@ export default class Game extends Phaser.Scene {
 	}
 
 	update() {
-		if(this.mainPlayer) this.mainPlayer.update();
+
+		if (this.mainPlayer) {
+			this.mainPlayer.update();
+			let playerCords = {
+				x: this.mainPlayer.x,
+				y: this.mainPlayer.y
+			};
+			if (this.mainPlayer.oldPos) {
+				if (playerCords.x !== this.mainPlayer.oldPos.x ||
+					playerCords.y !== this.mainPlayer.oldPos.y) {
+					this.socket.emit("playerMoved", playerCords);
+				}
+			}
+			this.mainPlayer.oldPos = playerCords;
+		}
 	}
 
 	listenForEvents() {
 		this.socket = io("http://localhost:3000");
 
+		this.socket.emit("playerJoined");
+
 		this.socket.on("connect", function() {
 			console.log("connected");
 		});
 
-		this.socket.on('currentPlayers', (players) => {
-			Object.keys(players).forEach((id) => {
-				console.log(players);
-				if (players[id].playerID === this.socket.id) {
-					this.createPlayer(true);
-				} else {
-					this.createPlayer(false);
+		this.socket.on('movePlayer', (player) => {
+			this.otherPlayers.getChildren().forEach((otherPlayer) => {
+				console.log(otherPlayer.playerID);
+				if (player.playerID === otherPlayer.playerID) {
+					console.log(player);
+					otherPlayer.x = player.pos[0];
+					otherPlayer.y = player.pos[1];
 				}
 			});
 		});
 
-		this.socket.on("newPlayer", () => {
-			this.createPlayer(false);
+		this.socket.on('currentPlayers', (players) => {
+			Object.keys(players).forEach((id) => {
+				if (players[id].playerID === this.socket.id) {
+					this.createPlayer(players[id], true);
+				} else {
+					this.createPlayer(players[id], false);
+				}
+			});
+		});
+
+		this.socket.on("newPlayer", (player) => {
+			this.createPlayer(player, false);
 		});
 	}
 
-	createPlayer(mainPlayer) {
-		let player = new Player(this, 0, 0, "player", 0, mainPlayer);
-		console.log(player);
-		if(!mainPlayer){
+	createPlayer(newPlayer, mainPlayer) {
+		console.log(newPlayer);
+		let player = new Player(
+			this,
+		 	newPlayer.pos[0], 
+		 	newPlayer.pos[1], 
+		 	"player", 
+		 	0, 
+		 	mainPlayer, 
+		 	newPlayer.playerID
+		 );
+		if (!mainPlayer) {
 			this.otherPlayers.add(player);
 		} else {
 			this.mainPlayer = player;
 		}
-		
+
 	}
 
 	createGroup() {
