@@ -17,6 +17,8 @@ export default class player extends Phaser.Physics.Arcade.Image {
 		this.setScale(6);
 		// add the player to our existing scene
 		this.scene.add.existing(this);
+
+		this.body.setCollideWorldBounds(true);
 	}
 
 	update() {

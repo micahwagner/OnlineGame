@@ -1,5 +1,6 @@
 import io from "socket.io-client"
 import Player from "../js/player/player.js"
+import Cell from "../js/Cell.js"
 
 export default class Game extends Phaser.Scene {
 	constructor() {
@@ -7,6 +8,8 @@ export default class Game extends Phaser.Scene {
 			key: "Game"
 		});
 		this.players = {};
+		this.map = [];
+		this.mapBounds = [1200, 1600];
 	}
 
 	preload() {
@@ -17,11 +20,30 @@ export default class Game extends Phaser.Scene {
 		console.log("bruh")
 		this.listenForEvents();
 		this.createGroup();
+		this.createMap(2, 2);
+		this.camera = this.cameras.main.centerOn(400, 300);
+		this.physics.world.setBounds(0, 0, this.mapBounds[1], this.mapBounds[0]);
+		console.log(this.map)
+		this.cameraPos = [0,0];
 	}
 
 	update() {
 
 		if (this.mainPlayer) {
+			let camMapPos = this.objectMapPos(this.cameraPos[0], this.cameraPos[1]);
+			let mainPlayerMapPos = this.objectMapPos(this.mainPlayer.x, this.mainPlayer.y);
+
+			if (mainPlayerMapPos[0] !== camMapPos[0] || mainPlayerMapPos[1] !== camMapPos[1]) {
+
+				this.camera.centerOnX(this.map[mainPlayerMapPos[0]][mainPlayerMapPos[1]].x);
+				this.camera.centerOnY(this.map[mainPlayerMapPos[0]][mainPlayerMapPos[1]].y);
+				this.cameraPos[0] = this.map[mainPlayerMapPos[0]][mainPlayerMapPos[1]].x;
+				this.cameraPos[1] = this.map[mainPlayerMapPos[0]][mainPlayerMapPos[1]].y;
+
+				console.log(this.map[mainPlayerMapPos[0]][mainPlayerMapPos[1]].x);
+
+			}
+
 			this.mainPlayer.update();
 			let playerCords = {
 				x: this.mainPlayer.x,
@@ -48,9 +70,7 @@ export default class Game extends Phaser.Scene {
 
 		this.socket.on('movePlayer', (player) => {
 			this.otherPlayers.getChildren().forEach((otherPlayer) => {
-				console.log(otherPlayer.playerID);
 				if (player.playerID === otherPlayer.playerID) {
-					console.log(player);
 					otherPlayer.x = player.pos[0];
 					otherPlayer.y = player.pos[1];
 				}
@@ -72,17 +92,40 @@ export default class Game extends Phaser.Scene {
 		});
 	}
 
+	createMap(w, h) {
+		for (let x = 0; x < w; x++) {
+			for (let y = 0; y < h; y++) {
+				if (this.map[x] == undefined) {
+					this.map[x] = [0];
+				} else {
+					this.map[x].push(0);
+				}
+			}
+		}
+
+		for (let x = 0; x < w; x++) {
+			for (let y = 0; y < h; y++) {
+				this.map[x][y] = new Cell(this, x, y);
+			}
+		}
+	}
+
+
+	objectMapPos(x, y) {
+		return [Math.floor(x / this.mapBounds[1] * this.map.length), Math.floor(y / this.mapBounds[0] * this.map[0].length)];
+	}
+
 	createPlayer(newPlayer, mainPlayer) {
 		console.log(newPlayer);
 		let player = new Player(
 			this,
-		 	newPlayer.pos[0], 
-		 	newPlayer.pos[1], 
-		 	"player", 
-		 	0, 
-		 	mainPlayer, 
-		 	newPlayer.playerID
-		 );
+			newPlayer.pos[0],
+			newPlayer.pos[1],
+			"player",
+			0,
+			mainPlayer,
+			newPlayer.playerID
+		);
 		if (!mainPlayer) {
 			this.otherPlayers.add(player);
 		} else {

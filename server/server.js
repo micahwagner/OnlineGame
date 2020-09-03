@@ -12,6 +12,7 @@ io.on('connection', function(socket) {
 	console.log(players);
 
 	socket.on("playerMoved", (playerData) => {
+		console.log(playerData);
 		players[socket.id].pos[0] = playerData.x;
 		players[socket.id].pos[1] = playerData.y;
 
