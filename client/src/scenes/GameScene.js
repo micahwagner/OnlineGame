@@ -9,7 +9,7 @@ export default class Game extends Phaser.Scene {
 		});
 		this.players = {};
 		this.map = [];
-		this.mapBounds = [1200, 1600];
+		this.area = [5, 5];
 	}
 
 	preload() {
@@ -20,11 +20,14 @@ export default class Game extends Phaser.Scene {
 		console.log("bruh")
 		this.listenForEvents();
 		this.createGroup();
-		this.createMap(2, 2);
+		this.width = this.sys.game.canvas.width;
+		this.height = this.sys.game.canvas.height;
+		this.mapBounds = [this.width * this.area[0], this.height * this.area[1]];
+		this.createMap(this.mapBounds[0] / this.width, this.mapBounds[1] / this.height);
 		this.camera = this.cameras.main.centerOn(400, 300);
-		this.physics.world.setBounds(0, 0, this.mapBounds[1], this.mapBounds[0]);
+		this.physics.world.setBounds(0, 0, this.mapBounds[0], this.mapBounds[1]);
 		console.log(this.map)
-		this.cameraPos = [0,0];
+		this.cameraPos = [0, 0];
 	}
 
 	update() {
@@ -112,7 +115,7 @@ export default class Game extends Phaser.Scene {
 
 
 	objectMapPos(x, y) {
-		return [Math.floor(x / this.mapBounds[1] * this.map.length), Math.floor(y / this.mapBounds[0] * this.map[0].length)];
+		return [Math.floor(x / this.mapBounds[0] * this.map.length), Math.floor(y / this.mapBounds[1] * this.map[0].length)];
 	}
 
 	createPlayer(newPlayer, mainPlayer) {
